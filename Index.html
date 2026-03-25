@@ -11,7 +11,7 @@
 
 <body>
 
-    <!-- Pantalla de Inicio -->
+
     <div id="startScreen" class="start-screen">
         <div class="start-content">
             <img src="iconos/EMBLEMAS - LOCAL 1.png" alt="Cruz Roja Mexicana" class="start-logo">
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <!-- Pantalla de Selección de Escenario -->
+
     <div id="scenarioScreen" class="scenario-screen">
         <div class="scenario-content">
             <img src="iconos/EMBLEMAS - LOCAL 1.png" alt="Cruz Roja Mexicana" class="scenario-logo">
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <!-- Header del Juego -->
+
     <header id="gameHeader">
         <div class="header-content">
             <img src="iconos/EMBLEMAS - LOCAL 1.png" alt="Cruz Roja Mexicana - Juego de Seguridad en Casa"
@@ -93,10 +93,8 @@
                 <h3 style="color: var(--cruz-roja-red); margin-top: 0;" id="scenarioTitle">📍 Escenario</h3>
 
                 <div class="scenario-map-container" id="scenarioMapContainer">
-                    <!-- La imagen del escenario se cargará dinámicamente -->
                     <img id="scenarioMapImage" src="" alt="Mapa del escenario" class="scenario-map-image">
 
-                    <!-- Las zonas interactivas se generarán dinámicamente aquí -->
                     <div id="interactiveZonesContainer" class="interactive-zones-container"></div>
                 </div>
             </section>
@@ -158,13 +156,23 @@
                 </div>
             </section>
 
-            <!-- Sección de la Mascota (Derecha) -->
+
             <section class="mascot-section">
                 <h3 style="color: var(--cruz-roja-red); margin-top: 0;">🎭 Ayudante</h3>
                 <div class="mascot-feedback-container" id="mascotFeedbackArea">
                     <div class="mascot-dialog" id="mascotDialog"></div>
                     <img src="" alt="Reacción personaje" class="mascot-image" id="mascotImage">
                 </div>
+
+                <!-- Personaje "¿Sabías que?" - se asoma por el borde derecho del panel -->
+                <div id="sabiasQueContainer" class="sabias-que-container" style="display:none;">
+                    <div class="sabias-que-bubble" id="sabiasQueBubble">
+                        <span class="sabias-que-text" id="sabiasQueText"></span>
+                    </div>
+                    <img src="iconos/mujer.png" alt="Personaje Cruz Roja" class="sabias-que-character"
+                        id="sabiasQueCharacter">
+                </div>
+
             </section>
         </div>
     </main>
@@ -181,6 +189,7 @@
             <button class="btn-restart" onclick="restartGame()">Reiniciar Juego</button>
         </div>
     </div>
+
 
 
     <script src="codigo/script.js"></script>
