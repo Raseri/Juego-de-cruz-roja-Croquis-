@@ -240,3 +240,125 @@
         font-size: 1.2rem;
     }
 }
+
+/* ===== PERSONAJE "¿SABÍAS QUE?" - dentro del panel Ayudante ===== */
+
+/*
+ * El .mascot-section ya tiene position relative implícitamente por ser
+ * bloque de grilla. Le agregamos overflow:hidden para que el personaje
+ * que se asoma "desde afuera" quede recortado por el borde del panel.
+ */
+.mascot-section {
+    overflow: hidden;
+}
+
+/*
+ * El contenedor ocupa el fondo del panel.
+ * Empieza completamente desplazado a la derecha (fuera del panel)
+ * y se desliza hacia adentro con la clase .peek-in
+ */
+.sabias-que-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    /* Oculto a la derecha, justo fuera del borde del panel */
+    transform: translateX(110%);
+    transition: transform 0.65s cubic-bezier(0.34, 1.42, 0.64, 1);
+    z-index: 10;
+    pointer-events: none;
+    padding-bottom: 6px;
+}
+
+/* Deslizarse hacia adentro — el personaje asomándose */
+.sabias-que-container.peek-in {
+    transform: translateX(0%);
+}
+
+/* Imagen del personaje */
+.sabias-que-character {
+    width: 145px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+    filter: drop-shadow(-3px 3px 8px rgba(0, 0, 0, 0.28));
+}
+
+/* Burbuja de diálogo */
+.sabias-que-bubble {
+    background: white;
+    border: 2.5px solid #CE1126;
+    border-radius: 16px 16px 4px 16px;
+    padding: 12px 15px;
+    max-width: 200px;
+    min-width: 140px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+    margin-bottom: 58px;
+    margin-right: 8px;
+    position: relative;
+    opacity: 0;
+    transform: scale(0.82) translateX(12px);
+    transition: opacity 0.38s ease 0.45s, transform 0.38s ease 0.45s;
+}
+
+/* Flecha de la burbuja apuntando hacia el personaje (derecha) */
+.sabias-que-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    right: -14px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 14px solid white;
+}
+
+.sabias-que-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 9px;
+    right: -18px;
+    width: 0;
+    height: 0;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 17px solid #CE1126;
+}
+
+/* Burbuja visible cuando el personaje se asoma */
+.sabias-que-container.peek-in .sabias-que-bubble {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+}
+
+/* Texto dentro de la burbuja */
+.sabias-que-text {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.5;
+    display: block;
+}
+
+/* Solo "¿Sabías que..." en rojo y negrita */
+.sabias-que-label {
+    color: #CE1126;
+    font-weight: 700;
+}
+
+/* Responsive móvil */
+@media (max-width: 768px) {
+    .sabias-que-character {
+        width: 100px;
+    }
+
+    .sabias-que-bubble {
+        max-width: 150px;
+        font-size: 0.72rem;
+        margin-bottom: 42px;
+    }
+}

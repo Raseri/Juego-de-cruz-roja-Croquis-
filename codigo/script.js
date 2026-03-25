@@ -373,6 +373,9 @@ function selectScenario(scenarioId) {
     initGameInteractions();
 
     filterSidebarByScenario();
+
+    // Iniciar el sistema ¿Sabías que? para este mapa
+    iniciarSabiasQue();
 }
 function createInteractiveZones() {
     interactiveZonesContainer.innerHTML = '';
@@ -738,10 +741,10 @@ function showMascotReaction(isCorrect, message) {
     const isMobile = window.innerWidth <= 768;
 
     if (isCorrect) {
-        mascotImg.src = "pulgararriba.png";
+        mascotImg.src = "iconos/pulgararriba.png";
         mascotDialog.className = 'mascot-dialog success';
     } else {
-        mascotImg.src = "pulgarabajo.png";
+        mascotImg.src = "iconos/pulgarabajo.png";
         mascotDialog.className = 'mascot-dialog error';
     }
 
@@ -809,6 +812,9 @@ function updateStarsBasedOnScore() {
 }
 
 function showFinalScreen() {
+    // Detener el personaje ¿Sabías que? al terminar el juego
+    detenerSabiasQue();
+
     const total = correctCount + incorrectCount;
     const average = total > 0 ? Math.round((correctCount / total) * 100) : 0;
 
@@ -840,6 +846,7 @@ function showFinalScreen() {
 }
 
 function restartGame() {
+    detenerSabiasQue();
     location.reload();
 }
 
@@ -874,3 +881,144 @@ window.debugZones = function () {
     });
     console.log('=================================');
 };
+
+/* =====================================================
+   SISTEMA "¿SABÍAS QUE?" - PERSONAJE MUJER
+   Muestra un dato educativo aleatorio cada 30 segundos
+   ===================================================== */
+
+const SABIAS_QUE_DATOS = [
+    '¿Sabías que... la Cruz Roja nació hace más de 160 años? Su misión es ayudar a cualquier persona que lo necesite, sin importar de dónde sea.',
+    '¿Sabías que... el número de emergencias es el 911? Es un número muy importante y solo debe usarse cuando alguien necesita ayuda real y urgente.',
+    '¿Sabías que... los voluntarios de la Cruz Roja no solo viajan en ambulancias? También ayudan a rescatar mascotas y a llevar comida cuando hay desastres naturales.',
+    '¿Sabías que... la Cruz Roja y la Media Luna Roja significan exactamente lo mismo? Son símbolos internacionales que dicen "¡Aquí te ayudamos y te protegemos!".',
+    '¿Sabías que... el humo de un incendio siempre sube hacia el techo? Por eso, para salir a salvo de un lugar con humo, debes caminar agachadito o gateando.',
+    '¿Sabías que... el agua y la electricidad no son amigos? Nunca debes tocar un enchufe, un cable o un aparato eléctrico si tienes las manos mojadas.',
+    '¿Sabías que... un extintor rojo sirve para apagar fuegos comunes, pero hay otros tipos de extintores para fuegos eléctricos? ¡Por eso es importante que los usen los adultos!',
+    '¿Sabías que... tu casa debe tener un "Punto de Reunión"? Es un lugar seguro afuera donde tu familia debe encontrarse si hay una emergencia.',
+    '¿Sabías que... si te raspas la rodilla, lo mejor es lavarla solo con agua limpia y jabón? No necesitas ponerle cosas que ardan.',
+    '¿Sabías que... un botiquín de primeros auxilios no debe parecer una caja de juguetes? Debe estar en un lugar seguro donde los más pequeños o las mascotas no lo alcancen.',
+    '¿Sabías que... tu cuerpo es súper inteligente? Cuando te haces un pequeño corte, tu propia sangre crea una "costra" que funciona como una curita natural para protegerte.'
+];
+
+// Estado del sistema ¿Sabías que?
+let sabiasQueIndices = [];       // Cola aleatoria de índices
+let sabiasQueIntervalId = null;  // ID del intervalo de 30 segundos
+let sabiasQueTimeoutId = null;   // ID del timeout para ocultar el personaje
+
+/**
+ * Genera una cola aleatoria de todos los índices (shuffle de Fisher-Yates)
+ * Cuando se acaba la cola, se regenera para evitar repetición inmediata.
+ */
+function generarColaSabiasQue() {
+    const indices = SABIAS_QUE_DATOS.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices;
+}
+
+/**
+ * Muestra el personaje asomándose con un dato educativo aleatorio.
+ * Permanece visible 15 segundos y luego se oculta.
+ * Tras 5 segundos de pausa, aparece de nuevo con otro dato.
+ */
+function mostrarSabiasQue() {
+    // Si no hay indices en la cola, regenerar
+    if (sabiasQueIndices.length === 0) {
+        sabiasQueIndices = generarColaSabiasQue();
+    }
+
+    const indice = sabiasQueIndices.pop();
+    const texto = SABIAS_QUE_DATOS[indice];
+
+    const container = document.getElementById('sabiasQueContainer');
+    const textEl = document.getElementById('sabiasQueText');
+
+    if (!container || !textEl) return;
+
+    // Separar "¿Sabías que..." del resto para colorearlo solo a él
+    const marcador = '¿Sabías que...';
+    let html;
+    if (texto.startsWith(marcador)) {
+        const resto = texto.slice(marcador.length);
+        html = `<span class="sabias-que-label">${marcador}</span>${resto}`;
+    } else {
+        html = texto;
+    }
+    textEl.innerHTML = html;
+    container.style.display = 'flex';
+
+    // Pequeño delay para que el browser procese el display antes de la transición
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            container.classList.add('peek-in');
+        });
+    });
+
+    // Limpiar cualquier timeout previo
+    clearTimeout(sabiasQueTimeoutId);
+
+    // Después de 15 segundos, ocultar el personaje
+    sabiasQueTimeoutId = setTimeout(() => {
+        ocultarSabiasQue();
+    }, 15000);
+}
+
+/**
+ * Desliza al personaje fuera del panel y luego lo oculta.
+ * Tras 5 segundos de pausa, programa el siguiente dato.
+ */
+function ocultarSabiasQue() {
+    const container = document.getElementById('sabiasQueContainer');
+    if (!container) return;
+
+    container.classList.remove('peek-in');
+
+    // Esperar transición de salida (0.7s) + pausa de 5s antes del próximo dato
+    sabiasQueTimeoutId = setTimeout(() => {
+        container.style.display = 'none';
+        // 5 segundos de pausa antes de mostrar el siguiente dato
+        sabiasQueTimeoutId = setTimeout(() => {
+            mostrarSabiasQue();
+        }, 5000);
+    }, 700);
+}
+
+/**
+ * Arranca el ciclo de ¿Sabías que?:
+ * - Primera aparición a los 4 segundos de iniciar el mapa
+ * - Luego: 15 segundos visible → 5 segundos pausa → siguiente dato
+ */
+function iniciarSabiasQue() {
+    detenerSabiasQue(); // limpiar si ya había uno corriendo
+
+    const container = document.getElementById('sabiasQueContainer');
+    if (container) container.style.display = 'none';
+
+    // Inicializar cola aleatoria
+    sabiasQueIndices = generarColaSabiasQue();
+
+    // Primera aparición a los 4 segundos de iniciar el mapa
+    sabiasQueTimeoutId = setTimeout(() => {
+        mostrarSabiasQue();
+        // El ciclo continúa automáticamente: mostrar -> 15s -> ocultar -> 5s -> mostrar...
+    }, 4000);
+}
+
+/**
+ * Detiene el ciclo de ¿Sabías que? y oculta el personaje (para reiniciar).
+ */
+function detenerSabiasQue() {
+    clearInterval(sabiasQueIntervalId);
+    clearTimeout(sabiasQueTimeoutId);
+    sabiasQueIntervalId = null;
+    sabiasQueTimeoutId = null;
+
+    const container = document.getElementById('sabiasQueContainer');
+    if (container) {
+        container.classList.remove('peek-in');
+        container.style.display = 'none';
+    }
+}
